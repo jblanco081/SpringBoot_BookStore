@@ -64,6 +64,9 @@ Add user authentication (future enhancement)
 
 Connect to PostgreSQL or MySQL for production-ready DB
 
+## 📎 License
+This project is open-source and available under the MIT License.
+
 ## 👤 Author
 Julian Blanco
 
