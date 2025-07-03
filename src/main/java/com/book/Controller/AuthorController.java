@@ -1,86 +1,83 @@
 package com.book.Controller;
 
-import java.util.Optional;
 import java.util.List;
-
-import com.book.Service.AuthorService;
-import com.book.Model.Author;
-import com.book.DTO.AuthorUpdateDTO;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.book.DTO.AuthorUpdateDTO;
+import com.book.Model.Author;
+import com.book.Service.AuthorService;
+
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 
 
 @RestController
-@RequestMapping
+@RequestMapping("/api/authors")
 public class AuthorController {
 
     private final AuthorService authorService;
 
     public AuthorController(AuthorService authorService) {
+        
         this.authorService = authorService;
     }
 
     @Operation(summary= "Adds a new author!")
-    @PostMapping("/newAuthor")
+    @PostMapping("/authors")
     public ResponseEntity<String> addAuthor(@Valid @RequestBody Author author) {
-        if (authorService.existsByName(author.getName())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-            .body("Author already exists!");
-        }
-
+        
         Author savedAuthor = authorService.saveAuthor(author);
         return ResponseEntity.status(HttpStatus.CREATED)
-        .body("Author " + savedAuthor + " has been added to System!");
+        .body("Author " + savedAuthor.getName() + " has been added to System!");
     }
 
     @Operation(summary= "Gets all authors")
     @GetMapping("/authors")
     public List<Author> getAuthors() {
+        
         return authorService.getAllAuthors();
     }
 
     @Operation(summary= "Gets specific author by name")
     @GetMapping("/authors/{name}")
     public ResponseEntity<Author> getAuthorByName(@PathVariable String name) {
-        Optional<Author> author = authorService.getAuthorByName(name);
-        return author.map(ResponseEntity::ok)
-        .orElse(ResponseEntity.notFound()
-        .build());
+        
+        Author author = authorService.getAuthorByName(name);
+        
+        return ResponseEntity.ok(author);
     }
 
     @Operation(summary= "Deletes author by id")
     @DeleteMapping("/authors/{id}")
     public ResponseEntity<String> deleteAuthorById(@PathVariable Long id) {
-        Optional<Author> author = authorService.getAuthorById(id);
-        if (author.isPresent()) {
+        Author author = authorService.getAuthorById(id);
+        
         authorService.deleteAuthorById(id);
+
         return ResponseEntity.ok("Author deleted successfully!");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body("This author ID does not exist");
-        }
     }
 
     @Operation(summary= "Update an existing author by ID")
     @PutMapping("authors/{id}")
     public ResponseEntity<String> updateAuthorById(@PathVariable Long id, 
     @Valid @RequestBody AuthorUpdateDTO updateAuthorDTO) {
-        Optional<Author> authorOptional = authorService.getAuthorById(id);
+        Author author = authorService.getAuthorById(id);
 
-        if (authorOptional.isPresent()) {
-            Author author = authorOptional.get();
-            author.setName(updateAuthorDTO.getName());
+        author.setName(updateAuthorDTO.getName());
 
-            authorService.saveAuthor(author);
+        authorService.saveAuthor(author);
 
-            return ResponseEntity.ok("Author updated: " + author.getName());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body("Author not found!");
-        }
+        return ResponseEntity.ok("Author updated: " + author.getName());
+        
     }
 }

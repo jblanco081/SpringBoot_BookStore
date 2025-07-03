@@ -1,11 +1,18 @@
 package com.book.Controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.book.DTO.BookCreateDTO;
 import com.book.DTO.BookUpdateDTO;
@@ -18,7 +25,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping()
+@RequestMapping("/api/books")
 public class BookController {
     
     private final BookService bookService;
@@ -30,23 +37,18 @@ public class BookController {
     }
 
     @Operation(summary= "Adds a new book")
-    @PostMapping("/newBook")
+    @PostMapping("/books")
     public ResponseEntity<String> addBook(@Valid @RequestBody BookCreateDTO bookCreateDTO) {
         if (bookService.existsByTitle(bookCreateDTO.getTitle())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-            .body("Title already exists!");
+            .body("Book with title " + bookCreateDTO.getTitle() + " already exists.");
         }
 
-        Optional<Author> authorOptional = authorService.getAuthorById(bookCreateDTO.getAuthorId());
-            
-        if (authorOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body("Invalid Author ID provided.");
-        }
+        Author author = authorService.getAuthorById(bookCreateDTO.getAuthorId());
 
         Book book = new Book();
         book.setTitle(bookCreateDTO.getTitle());
-        book.setAuthor(authorOptional.get());
+        book.setAuthor(author);
 
         Book savedBook = bookService.saveBook(book);
 
@@ -63,10 +65,8 @@ public class BookController {
     @Operation(summary= "Gets a specific book by its ID")
     @GetMapping("/books/{id}")
     public ResponseEntity<Book> getBook(@PathVariable Long id) {
-        Optional<Book> book = bookService.getBook(id);
-        return book.map(ResponseEntity::ok)
-        .orElse(ResponseEntity.notFound()
-        .build());
+        Book book = bookService.getBook(id);
+        return ResponseEntity.ok(book);
     }
 
     @Operation(summary= "Gets all books from a specific author")
@@ -74,25 +74,17 @@ public class BookController {
     public ResponseEntity<List<Book>> searchBooksByAuthorName(@RequestParam String name) {
         List<Book> books = bookService.searchByAuthorName(name);
 
-        if(books.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body(List.of());
-        }
-
         return ResponseEntity.ok(books);
     }
 
     @Operation(summary= "Deletes a specific book by its ID")
     @DeleteMapping("/books/{id}")
     public ResponseEntity<String> deleteBook(@PathVariable Long id) {
-        Optional <Book> book = bookService.getBook(id);
-        if (book.isPresent()) {
+        Book book = bookService.getBook(id);
         bookService.deleteBookById(id);
+
         return ResponseEntity.ok("Book deleted successfully!");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body("This book ID does not exist");
-        }
+    
     }
 
     @Operation(summary= "Update an existing book by ID")
@@ -101,31 +93,19 @@ public class BookController {
         @PathVariable Long id, 
         @Valid @RequestBody BookUpdateDTO updatedBookDTO) {
         
-        Optional<Book> bookOptional = bookService.getBook(id);
+        Book book = bookService.getBook(id);
         
-        if (bookOptional.isPresent()) {
-           
-            Book book = bookOptional.get();
-            book.setTitle(updatedBookDTO.getTitle());
+        book.setTitle(updatedBookDTO.getTitle());
 
-            Optional<Author> authorOptional = authorService.getAuthorById(updatedBookDTO.getAuthorId());
-            
-            if (authorOptional.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Invalid Author ID provided.");
-            }
+        Author author = authorService.getAuthorById(updatedBookDTO.getAuthorId());
 
-            book.setAuthor(authorOptional.get());
+        book.setAuthor(author);
 
+        bookService.saveBook(book);
             
-            bookService.saveBook(book);
-            
-            return ResponseEntity.ok("Book updated: " + book.getTitle());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("Book not found!");
+        return ResponseEntity.ok("Book updated: " + book.getTitle());
+        
         }
+
     }
     
-
-}

@@ -1,9 +1,10 @@
 package com.book.Service;
 
 import java.util.List;
-import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
+import com.book.Exception.AuthorNotFoundException;
 import com.book.Model.Author;
 import com.book.Repository.AuthorRepository;
 
@@ -24,12 +25,14 @@ public class AuthorService {
         return authorRepository.save(author);
     }
 
-    public Optional<Author> getAuthorByName(String name) {
-        return authorRepository.findByName(name);
+    public Author getAuthorByName(String name) {
+        return authorRepository.findByName(name)
+        .orElseThrow(() -> new AuthorNotFoundException("Author with name " + name + " not found"));
     }
 
-    public Optional<Author> getAuthorById(Long id) {
-        return authorRepository.findById(id);
+    public Author getAuthorById(Long id) {
+        return authorRepository.findById(id)
+        .orElseThrow(() -> new AuthorNotFoundException("Author with ID " + id + " not found"));
     }
 
     public List<Author> getAllAuthors() {

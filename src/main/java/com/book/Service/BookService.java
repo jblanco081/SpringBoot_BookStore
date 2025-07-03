@@ -1,10 +1,10 @@
 package com.book.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.book.Exception.BookNotFoundException;
 import com.book.Model.Book;
 import com.book.Repository.BookRepository;
 
@@ -29,20 +29,27 @@ public class BookService {
         return bookRepository.findAll();
     }
 
-    public Optional<Book> getBook(Long id) {
-        return bookRepository.findById(id);
+    public Book getBook(Long id) {
+        return bookRepository.findById(id)
+        .orElseThrow(() -> new BookNotFoundException("Book with id " + id + " was not found"));
     }
 
     public void deleteBookById(Long id) {
+        if (!bookRepository.existsById(id)) {
+            throw new BookNotFoundException("Book with ID " + id + " was not found");
+        }
+        
         bookRepository.deleteById(id);
     }
 
-    public Optional<Book> updateBook(Long id, Book updatedBook) {
-        return bookRepository.findById(id).map(existingBook -> {
-            existingBook.setTitle(updatedBook.getTitle());
-            existingBook.setAuthor(updatedBook.getAuthor());
-            return bookRepository.save(existingBook);
-        });
+    public Book updateBook(Long id, Book updatedBook) {
+        Book existingBook = bookRepository.findById(id)
+        .orElseThrow(() -> new BookNotFoundException("Book with ID " + id + " was not found"));
+        
+        existingBook.setTitle(updatedBook.getTitle());
+        existingBook.setAuthor(updatedBook.getAuthor());
+        return bookRepository.save(existingBook);
+        
     }
 
     public List<Book> searchByAuthorName(String name) {

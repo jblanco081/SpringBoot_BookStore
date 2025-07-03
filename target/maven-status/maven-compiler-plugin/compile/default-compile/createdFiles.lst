@@ -1,0 +1,16 @@
+com\book\Controller\BookController.class
+com\book\Model\Book.class
+com\book\Main.class
+com\book\Controller\AuthorController.class
+com\book\Repository\AuthorRepository.class
+com\book\Exception\AuthorNotFoundException.class
+com\book\Exception\GlobalExceptionHandler.class
+com\book\Service\BookService.class
+com\book\DTO\BookUpdateDTO.class
+com\book\DTO\BookCreateDTO.class
+com\book\Exception\ErrorResponse.class
+com\book\DTO\AuthorUpdateDTO.class
+com\book\Repository\BookRepository.class
+com\book\Service\AuthorService.class
+com\book\Model\Author.class
+com\book\Exception\BookNotFoundException.class
