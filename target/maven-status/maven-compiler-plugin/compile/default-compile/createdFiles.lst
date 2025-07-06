@@ -13,4 +13,5 @@ com\book\DTO\AuthorUpdateDTO.class
 com\book\Repository\BookRepository.class
 com\book\Service\AuthorService.class
 com\book\Model\Author.class
+com\book\Config\SecurityConfig.class
 com\book\Exception\BookNotFoundException.class
