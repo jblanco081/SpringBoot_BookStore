@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { createBook } from '../services/bookService';
 
-const AddBook = () => {
+const AddBook = ( {onBookAdded }) => {
   const [book, setBook] = useState({
     title: '',
     author: {
@@ -13,7 +13,7 @@ const AddBook = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === 'author') {
+    if (name === 'authorName') {
       setBook({ ...book, author: { name: value } });
     } else {
       setBook({ ...book, [name]: value });
@@ -26,6 +26,7 @@ const AddBook = () => {
       .then(() => {
         alert('Book added successfully!');
         setBook({ title: '', author: { name: '' }, isbn: '' });
+        if (onBookAdded) onBookAdded();
       })
       .catch((err) => console.error('Error adding book:', err));
   };
@@ -43,7 +44,7 @@ const AddBook = () => {
         />
         <input
           type="text"
-          name="author"
+          name="authorName"
           placeholder="Author Name"
           value={book.author.name}
           onChange={handleChange}

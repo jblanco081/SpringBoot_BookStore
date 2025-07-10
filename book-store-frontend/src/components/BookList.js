@@ -1,38 +1,39 @@
 import React, { useEffect, useState } from 'react';
 import { getAllBooks } from '../services/bookService';
+import AddBook from "../components/AddBook";
 
-const BookList = () => {
+function BookList() {
   const [books, setBooks] = useState([]);
 
+  const fetchBooks = () => {
+    getAllBooks()
+      .then((response) => {
+        setBooks(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching books:', error);
+      });
+  };
+
   useEffect(() => {
-  getAllBooks()
-    .then(response => setBooks(response.data))
-    .catch(error => console.error("Failed to fetch books:", error));
-}, []);
+    fetchBooks();
+  }, []);
 
   return (
     <div>
+      <AddBook onBookAdded={fetchBooks} />
       <h2>Book List</h2>
-      <table border="1">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Author Name</th>
-            <th>ISBN</th>
-          </tr>
-        </thead>
-        <tbody>
-            {books.map(book => (
-                <tr key={book.id}>
-                <td>{book.title}</td>
-                <td>{book.author?.name || 'N/A'}</td>
-                <td>{book.isbn || 'N/A'}</td>
-                </tr>
-            ))}
-        </tbody>
-      </table>
+      {books.length === 0 ? (
+        <p>No books found.</p>
+      ) : (
+        <ul>
+          {books.map((book) => (
+            <li key={book?.id}>{book?.title} by {book?.authorName}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
-};
+}
 
 export default BookList;

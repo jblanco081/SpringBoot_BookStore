@@ -9,4 +9,6 @@ export const getAllBooks = () => {
 export const createBook = (book) => axios.post(API_BASE_URL, book);
 
 
-export default { getAllBooks, createBook };
+const bookService = { getAllBooks, createBook };
+
+export default bookService;

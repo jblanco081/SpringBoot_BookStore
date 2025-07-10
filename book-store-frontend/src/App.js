@@ -1,6 +1,6 @@
 import React from 'react';
 import BookList from './components/BookList';
-import AddBook from './components/AddBook';
+import AuthorList from './components/AuthorList';
 
 import './App.css'
 
@@ -9,12 +9,19 @@ function App() {
     <div className="App">
       <header>
         <h1>📚 Julian’s Book Store</h1>
-        <p>Browse all available books</p>
+        <p>Manage your books and authors</p>
       </header>
 
       <main>
-        <AddBook />
+        <section>
         <BookList />
+        </section>
+
+        <hr />
+
+        <section>
+          {<AuthorList />}
+        </section>
       </main>
 
       <footer>
