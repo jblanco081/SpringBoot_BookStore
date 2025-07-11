@@ -1,6 +1,7 @@
 package com.book.Controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.book.DTO.AuthorResponseDTO;
 import com.book.DTO.AuthorUpdateDTO;
 import com.book.Model.Author;
 import com.book.Service.AuthorService;
@@ -33,7 +35,7 @@ public class AuthorController {
     }
 
     @Operation(summary= "Adds a new author!")
-    @PostMapping("/authors")
+    @PostMapping()
     public ResponseEntity<String> addAuthor(@Valid @RequestBody Author author) {
         
         Author savedAuthor = authorService.saveAuthor(author);
@@ -42,14 +44,22 @@ public class AuthorController {
     }
 
     @Operation(summary= "Gets all authors")
-    @GetMapping("/authors")
-    public List<Author> getAuthors() {
+    @GetMapping()
+    public List<AuthorResponseDTO> getAuthors() {
         
-        return authorService.getAllAuthors();
+        return authorService.getAllAuthors()
+        .stream()
+        .map(author -> {
+            AuthorResponseDTO dto = new AuthorResponseDTO();
+            dto.setName(author.getName());
+            dto.setID(author.getId());
+            return dto;
+        })
+        .collect(Collectors.toList());
     }
 
     @Operation(summary= "Gets specific author by name")
-    @GetMapping("/authors/{name}")
+    @GetMapping("/{name}")
     public ResponseEntity<Author> getAuthorByName(@PathVariable String name) {
         
         Author author = authorService.getAuthorByName(name);
@@ -58,7 +68,7 @@ public class AuthorController {
     }
 
     @Operation(summary= "Deletes author by id")
-    @DeleteMapping("/authors/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteAuthorById(@PathVariable Long id) {
         Author author = authorService.getAuthorById(id);
         
@@ -68,7 +78,7 @@ public class AuthorController {
     }
 
     @Operation(summary= "Update an existing author by ID")
-    @PutMapping("authors/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<String> updateAuthorById(@PathVariable Long id, 
     @Valid @RequestBody AuthorUpdateDTO updateAuthorDTO) {
         Author author = authorService.getAuthorById(id);

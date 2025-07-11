@@ -14,14 +14,17 @@ function App() {
 
       <main>
         <section>
-        <BookList />
+          {<AuthorList />}
         </section>
 
         <hr />
 
         <section>
-          {<AuthorList />}
+        <BookList />
         </section>
+
+
+        
       </main>
 
       <footer>

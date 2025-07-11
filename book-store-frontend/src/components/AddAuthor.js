@@ -6,13 +6,13 @@ const AddAuthor = ({ onAuthorAdded }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    createAuthor({ name })
+    createAuthor({ name }) // pass the object correctly
       .then(() => {
-        alert('Author added successfully!');
-        setName('');
-        onAuthorAdded(); // refresh the author list
+        alert('Author added!');
+        setName(''); // clear input
+        if (onAuthorAdded) onAuthorAdded(); // trigger refresh in parent
       })
-      .catch(err => console.error("Error adding author:", err));
+      .catch(err => console.error('Error adding author:', err));
   };
 
   return (

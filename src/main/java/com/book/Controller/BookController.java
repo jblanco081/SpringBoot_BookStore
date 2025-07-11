@@ -1,6 +1,7 @@
 package com.book.Controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.book.DTO.BookCreateDTO;
+import com.book.DTO.BookResponseDTO;
 import com.book.DTO.BookUpdateDTO;
 import com.book.Model.Author;
 import com.book.Model.Book;
@@ -37,7 +39,7 @@ public class BookController {
     }
 
     @Operation(summary= "Adds a new book")
-    @PostMapping("/books")
+    @PostMapping()
     public ResponseEntity<String> addBook(@Valid @RequestBody BookCreateDTO bookCreateDTO) {
         if (bookService.existsByTitle(bookCreateDTO.getTitle())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -48,6 +50,7 @@ public class BookController {
 
         Book book = new Book();
         book.setTitle(bookCreateDTO.getTitle());
+        book.setISBN(bookCreateDTO.getISBN());
         book.setAuthor(author);
 
         Book savedBook = bookService.saveBook(book);
@@ -57,20 +60,30 @@ public class BookController {
     }
 
     @Operation(summary = "Gets all books")
-    @GetMapping("/books")
-    public List<Book> getBooks() {
-        return bookService.getAllBooks();
+    @GetMapping()
+    public List<BookResponseDTO> getBooks() {
+        return bookService.getAllBooks()
+        .stream()
+        .map(book -> {
+            BookResponseDTO dto = new BookResponseDTO();
+            dto.setId(book.getId());
+            dto.setTitle(book.getTitle());
+            dto.setIsbn(book.getISBN());
+            dto.setAuthorName(book.getAuthor() != null ? book.getAuthor().getName() : "Unknown");
+            return dto;
+        })
+        .collect(Collectors.toList());
     }
 
     @Operation(summary= "Gets a specific book by its ID")
-    @GetMapping("/books/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Book> getBook(@PathVariable Long id) {
         Book book = bookService.getBook(id);
         return ResponseEntity.ok(book);
     }
 
     @Operation(summary= "Gets all books from a specific author")
-    @GetMapping("/books/search")
+    @GetMapping("/search")
     public ResponseEntity<List<Book>> searchBooksByAuthorName(@RequestParam String name) {
         List<Book> books = bookService.searchByAuthorName(name);
 
@@ -78,7 +91,7 @@ public class BookController {
     }
 
     @Operation(summary= "Deletes a specific book by its ID")
-    @DeleteMapping("/books/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteBook(@PathVariable Long id) {
         Book book = bookService.getBook(id);
         bookService.deleteBookById(id);
@@ -88,7 +101,7 @@ public class BookController {
     }
 
     @Operation(summary= "Update an existing book by ID")
-    @PutMapping("books/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<String> updateBookById(
         @PathVariable Long id, 
         @Valid @RequestBody BookUpdateDTO updatedBookDTO) {

@@ -17,6 +17,9 @@ public class Book {
     @NotBlank(message = "Title cannot be blank")
     private String title;
 
+    @NotBlank(message = "ISBN cannot be blank")
+    private String isbn;
+
     @ManyToOne
     @JoinColumn(name= "author_id")
     private Author author;
@@ -31,6 +34,14 @@ public class Book {
 
     public Author getAuthor() {
         return this.author;
+    }
+
+    public String getISBN() {
+        return this.isbn;
+    }
+
+    public void setISBN(String newISBN) {
+        this.isbn = newISBN;
     }
 
     public void setAuthor(Author newAuthor) {

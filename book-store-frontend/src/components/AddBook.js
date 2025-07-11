@@ -1,34 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createBook } from '../services/bookService';
+import { getAllAuthors } from '../services/authorService';
 
-const AddBook = ( {onBookAdded }) => {
+const AddBook = ({ onBookAdded }) => {
   const [book, setBook] = useState({
     title: '',
-    author: {
-      name: ''
-    },
+    authorId: '',
     isbn: ''
   });
 
+  const [authors, setAuthors] = useState([]);
+
+  useEffect(() => {
+  refreshAuthors();
+}, []);
+
+const refreshAuthors = () => {
+  getAllAuthors()
+    .then(response => setAuthors(response.data))
+    .catch(error => console.error('Error fetching authors:', error));
+};
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    if (name === 'authorName') {
-      setBook({ ...book, author: { name: value } });
-    } else {
-      setBook({ ...book, [name]: value });
-    }
+    setBook(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    createBook(book)
+
+    const payload = {
+      title: book.title,
+      isbn: book.isbn,
+      authorId: Number(book.authorId)
+    };
+
+    createBook(payload)
       .then(() => {
         alert('Book added successfully!');
-        setBook({ title: '', author: { name: '' }, isbn: '' });
+        setBook({ title: '', authorId: '', isbn: '' });
         if (onBookAdded) onBookAdded();
       })
-      .catch((err) => console.error('Error adding book:', err));
+      .catch(err => console.error('Error adding book:', err));
   };
 
   return (
@@ -44,18 +57,23 @@ const AddBook = ( {onBookAdded }) => {
         />
         <input
           type="text"
-          name="authorName"
-          placeholder="Author Name"
-          value={book.author.name}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
           name="isbn"
           placeholder="ISBN"
           value={book.isbn}
           onChange={handleChange}
         />
+        <select
+          name="authorId"
+          value={book.authorId}
+          onChange={handleChange}
+        >
+          <option value="">Select Author</option>
+          {authors.map((author) => (
+            <option key={author.id} value={author.id}>
+              {author.name} (ID: {author.id})
+            </option>
+          ))}
+        </select>
         <button type="submit">Add Book</button>
       </form>
     </div>

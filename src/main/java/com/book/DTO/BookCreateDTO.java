@@ -11,6 +11,9 @@ public class BookCreateDTO {
     @NotNull(message= "AuthorID must not be blank")
     private Long authorId;
 
+    @NotNull(message = "ISBN must not be blank")
+    private String isbn;
+
     public String getTitle() {
         return this.title;
     }
@@ -18,6 +21,14 @@ public class BookCreateDTO {
     public void setTitle(String newTitle) {
         this.title = newTitle;
     }
+
+    public String getISBN() {
+        return this.isbn;
+    }
+
+    public void setISBN(String newISBN) {
+        this.isbn = newISBN;
+    } 
 
     public Long getAuthorId() {
         return this.authorId;
