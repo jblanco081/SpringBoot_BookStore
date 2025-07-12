@@ -11,6 +11,16 @@ public class BookUpdateDTO {
     @NotNull(message= "AuthorID must not be blank")
     private Long authorId;
 
+    private String isbn;
+
+    public String getISBN() {
+        return this.isbn;
+    }
+
+    public void setISBN(String isbn) {
+        this.isbn = isbn;
+    }
+
     public String getTitle() {
         return this.title;
     }

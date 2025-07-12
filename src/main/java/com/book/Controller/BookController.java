@@ -109,6 +109,7 @@ public class BookController {
         Book book = bookService.getBook(id);
         
         book.setTitle(updatedBookDTO.getTitle());
+        book.setISBN(updatedBookDTO.getISBN());
 
         Author author = authorService.getAuthorById(updatedBookDTO.getAuthorId());
 

@@ -1,36 +1,32 @@
 import React from 'react';
-import BookList from './components/BookList';
-import AuthorList from './components/AuthorList';
-
-import './App.css'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './components/Home';
+import EditBook from './components/EditBook';
+import EditAuthor from './components/EditAuthor';
+import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <header>
-        <h1>📚 Julian’s Book Store</h1>
-        <p>Manage your books and authors</p>
-      </header>
+    <Router>
+      <div className="App">
+        <header>
+          <h1>📚 Julian’s Book Store</h1>
+          <p>Manage your books and authors</p>
+        </header>
 
-      <main>
-        <section>
-          {<AuthorList />}
-        </section>
+        <main>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/edit-book/:id" element={<EditBook />} />
+            <Route path="/edit-author/:id" element={<EditAuthor />} />
+          </Routes>
+        </main>
 
-        <hr />
-
-        <section>
-        <BookList />
-        </section>
-
-
-        
-      </main>
-
-      <footer>
-        <p>© 2025 Julian Blanco</p>
-      </footer>
-    </div>
+        <footer>
+          <p>© 2025 Julian Blanco</p>
+        </footer>
+      </div>
+    </Router>
   );
 }
 
